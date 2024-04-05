@@ -1,0 +1,11 @@
+﻿# Default ignored files
+/shelf/
+/workspace.xml
+# Rider ignored files
+/modules.xml
+/contentModel.xml
+/projectSettingsUpdater.xml
+/.idea.FFCoreFixes.iml
+# Datasource local storage ignored files
+/../../../../../../../../:\MEGA\konmaidev\ff\FFCoreFixes\.idea\.idea.FFCoreFixes\.idea/dataSources/
+/dataSources.local.xml

@@ -17,6 +17,7 @@ namespace AltInput {
         private static ConfigEntry<bool> ConfigEnabled;
         private static ConfigEntry<bool> OSDEnabled;
         private static ConfigEntry<String> AltInputDevId;
+        private static ConfigEntry<bool> AutoUseOnSingle;
 
         internal static ManualLogSource Log;
 
@@ -31,6 +32,7 @@ namespace AltInput {
             ConfigEnabled = Config.Bind("General", "Enable Plugin", true, "Enables AltInput");
             OSDEnabled = Config.Bind("General", "OSD", true, "Enables display of controller GUIDs on game start");
             AltInputDevId = Config.Bind("General", "AltInput DirectInput device GUID", "", "The device ID if you want to use AltInput");
+            AutoUseOnSingle = Config.Bind("General", "Auto-Use Single Controller", true, "Automatically use controller if only one is present");
 
             if (!ConfigEnabled.Value) {
                 Logger.LogInfo("Plugin is disabled");
@@ -39,7 +41,8 @@ namespace AltInput {
 
             Logger.LogDebug("Listing devices");
             directInput = new DirectInput();
-            foreach (var dev in directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices)) {
+            IList<DeviceInstance> devList = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices);
+            foreach (DeviceInstance dev in devList) {
                 Joystick js = new Joystick(directInput, dev.InstanceGuid);
                 String msg = "AltInput: Detected Controller '" + dev.InstanceGuid + "' (" + dev.ProductName + "): " +
                     js.Capabilities.AxeCount + " Axes, " + js.Capabilities.ButtonCount + " Buttons, " +
@@ -49,7 +52,7 @@ namespace AltInput {
                 } else {
                     Logger.LogInfo(msg);
                 }
-                if (dev.InstanceGuid.ToString() == AltInputDevId.Value) {
+                if (dev.InstanceGuid.ToString() == AltInputDevId.Value || (devList.Count == 1 && AutoUseOnSingle.Value)) {
                     diDevice = new AltDirectInputDevice(directInput, DeviceClass.GameControl, dev.InstanceGuid);
                     if (OSDEnabled.Value) {
                         Logger.LogMessage("Selected DirectInput device: " + dev.ProductName);

@@ -14,7 +14,7 @@ using FFCoreFixes.Patches;
 
 namespace FFCoreFixes
 {
-    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.5")]
+    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.5.1")]
     [BepInDependency("eu.harukakyoubate.altinput")]
     public class CoreFixesBehaviour : BaseUnityPlugin {
         private static readonly string[] AxisNames = { "Off", "HorizontalLeft1", "VerticalLeft1", "HorizontalRight1", "VerticalRight1", "HorizontalLeft2", "VerticalLeft2", "HorizontalRight2", "VerticalRight2", "HorizontalDpad1", "VerticalDpad1", "HorizontalDpad2", "VerticalDpad2" };
@@ -52,6 +52,7 @@ namespace FFCoreFixes
         public static ConfigEntry<bool> UsePhotonCloud;
         public static ConfigEntry<String> PhotonApplicationId;
         public static ConfigEntry<bool> ConfigShowCursor;
+        public static ConfigEntry<bool> AltInputP2Setting;
 
         private bool photonIsPatched;
 
@@ -86,8 +87,9 @@ namespace FFCoreFixes
             KeyRRight = Config.Bind("Game Input", "Right Stick Right", new KeyboardShortcut(KeyCode.RightArrow), "Game button");
             AltInputSetting = Config.Bind("Game Input (Controller)", "Controller Mode (AltInput)", AltInputMode.Off, "Use the AltInput plugin for controller input.");
             UseOnlyLeftStick = Config.Bind("Game Input (Controller)", "Use Only Left Stick", false, "Use only left stick from AltInput.");
+            AltInputP2Setting = Config.Bind("Game Input (Controller)", "Use AltInput P2 For Right Stick", false, "Uses the P2 Slot from AltInput for the right stick.");
 
-            
+
             InvertRX = Config.Bind("Game Input (Controller)", "Invert Right X Axis", false, "Inverts the right stick's X-Axis.");
             InvertRY = Config.Bind("Game Input (Controller)", "Invert Right Y Axis", false, "Inverts the right stick's Y-Axis.");
             ControllerDeadzone = Config.Bind("Game Input (Controller)", "Stick Deadzone", 50, new ConfigDescription("The deadzone size for stick input", new AcceptableValueRange<int>(0, 100)));
@@ -189,7 +191,10 @@ namespace FFCoreFixes
             }
             File.WriteAllText("monster.csv", str);
             str = "ID,CharacterID,Rarity\n";
-            foreach (var val in CollectionCardTable.EntityCollectionCardTable.dictionary.Values) {
+            foreach (var val in CollectionCardTable.CharacterTable.Dictionary.Values) {
+                str += val.ID + "," + val.characterID + "," + val.rarity + "\n";
+            }
+            foreach (var val in CollectionCardTable.JacketTable.Dictionary.Values) {
                 str += val.ID + "," + val.characterID + "," + val.rarity + "\n";
             }
             File.WriteAllText("colleca.csv", str);

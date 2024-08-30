@@ -43,13 +43,21 @@ namespace FFCoreFixes {
             float dz = CoreFixesBehaviour.ControllerDeadzone.Value / 100F;
 
             if (AltInputBehaviour.IsEnabled()) {
-                AltDirectInputDevice dev = AltInputBehaviour.GetDevice();
-                if (dev.HasState()) {
+                AltDirectInputDevice dev = AltInputBehaviour.GetDevice1();
+                AltDirectInputDevice dev2 = AltInputBehaviour.GetDevice2();
+                if (AltInputBehaviour.IsDevice1Active() && dev.HasState()) {
                     if (CoreFixesBehaviour.AltInputSetting.Value == CoreFixesBehaviour.AltInputMode.Ps) {
                         float lx = norm(dev.GetX());
                         float ly = norm(dev.GetY());
-                        float rx = norm(dev.GetZ());
-                        float ry = norm(dev.GetRZ());
+                        float rx;
+                        float ry;
+                        if (CoreFixesBehaviour.AltInputP2Setting.Value && AltInputBehaviour.IsDevice2Active() && dev2.HasState()) {
+                            rx = norm(dev2.GetX());
+                            ry = norm(dev2.GetY());
+                        } else {
+                            rx = norm(dev.GetZ());
+                            ry = norm(dev.GetRZ());
+                        }
                         if (CoreFixesBehaviour.InvertRX.Value) {
                             rx *= -1;
                         }
@@ -75,8 +83,15 @@ namespace FFCoreFixes {
                     } else if (CoreFixesBehaviour.AltInputSetting.Value == CoreFixesBehaviour.AltInputMode.Xbox) {
                         float lx = norm(dev.GetX());
                         float ly = norm(dev.GetY());
-                        float rx = norm(dev.GetRX());
-                        float ry = norm(dev.GetRY());
+                        float rx;
+                        float ry;
+                        if (CoreFixesBehaviour.AltInputP2Setting.Value && AltInputBehaviour.IsDevice2Active() && dev2.HasState()) {
+                            rx = norm(dev2.GetX());
+                            ry = norm(dev2.GetY());
+                        } else {
+                            rx = norm(dev.GetRX());
+                            ry = norm(dev.GetRY());
+                        }
                         if (CoreFixesBehaviour.InvertRX.Value) {
                             rx *= -1;
                         }

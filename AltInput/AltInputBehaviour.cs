@@ -16,13 +16,16 @@ namespace AltInput {
 
         private static ConfigEntry<bool> ConfigEnabled;
         private static ConfigEntry<bool> OSDEnabled;
-        private static ConfigEntry<String> AltInputDevId;
+        private static ConfigEntry<String> AltInputDevId1;
         private static ConfigEntry<bool> AutoUseOnSingle;
+        private static ConfigEntry<bool> AutoMerge;
+        private static ConfigEntry<String> AltInputDevId2;
 
         internal static ManualLogSource Log;
 
-        private static DirectInput directInput = new DirectInput();
-        private static AltDirectInputDevice diDevice;
+        private static bool[] diActive = new bool[2];
+        private static AltDirectInputDevice diDevice1;
+        private static AltDirectInputDevice diDevice2;
         private static bool altEnabled;
 
         void Awake() {
@@ -31,7 +34,8 @@ namespace AltInput {
 
             ConfigEnabled = Config.Bind("General", "Enable Plugin", true, "Enables AltInput");
             OSDEnabled = Config.Bind("General", "OSD", true, "Enables display of controller GUIDs on game start");
-            AltInputDevId = Config.Bind("General", "AltInput DirectInput device GUID", "", "The device ID if you want to use AltInput");
+            AltInputDevId1 = Config.Bind("General", "AltInput DirectInput device GUID (1)", "", "The device ID if you want to use AltInput");
+            AltInputDevId2 = Config.Bind("General", "AltInput DirectInput device GUID (2)", "", "The device ID if you want to use AltInput");
             AutoUseOnSingle = Config.Bind("General", "Auto-Use Single Controller", true, "Automatically use controller if only one is present");
 
             if (!ConfigEnabled.Value) {
@@ -40,46 +44,64 @@ namespace AltInput {
             }
 
             Logger.LogDebug("Listing devices");
-            directInput = new DirectInput();
-            IList<DeviceInstance> devList = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices);
-            foreach (DeviceInstance dev in devList) {
-                Joystick js = new Joystick(directInput, dev.InstanceGuid);
-                String msg = "AltInput: Detected Controller '" + dev.InstanceGuid + "' (" + dev.ProductName + "): " +
-                    js.Capabilities.AxeCount + " Axes, " + js.Capabilities.ButtonCount + " Buttons, " +
-                    js.Capabilities.PovCount + " POV(s)";
-                if (OSDEnabled.Value) {
-                    Logger.LogMessage(msg);
-                } else {
-                    Logger.LogInfo(msg);
-                }
-                if (dev.InstanceGuid.ToString() == AltInputDevId.Value || (devList.Count == 1 && AutoUseOnSingle.Value)) {
-                    diDevice = new AltDirectInputDevice(directInput, DeviceClass.GameControl, dev.InstanceGuid);
+            for (int p = 1; p <= 2; p++) {
+                DirectInput directInput = new DirectInput();
+                IList<DeviceInstance> devList = directInput.GetDevices(DeviceClass.GameControl, DeviceEnumerationFlags.AllDevices);
+                foreach (DeviceInstance dev in devList) {
+                    Joystick js = new Joystick(directInput, dev.InstanceGuid);
+                    String msg = "AltInput: Detected Controller '" + dev.InstanceGuid + "' (" + dev.ProductName + "): " +
+                        js.Capabilities.AxeCount + " Axes, " + js.Capabilities.ButtonCount + " Buttons";
                     if (OSDEnabled.Value) {
-                        Logger.LogMessage("Selected DirectInput device: " + dev.ProductName);
+                        Logger.LogMessage(msg);
                     } else {
-                        Logger.LogInfo("Selected DirectInput device: " + dev.ProductName);
+                        Logger.LogInfo(msg);
                     }
-                    altEnabled = true;
-                    break;
+                    if ((p == 1 && (dev.InstanceGuid.ToString() == AltInputDevId1.Value || (devList.Count == 1 && AutoUseOnSingle.Value))) || (p == 2 && dev.InstanceGuid.ToString() == AltInputDevId2.Value)) {
+                        if (p == 1) {
+                            diDevice1 = new AltDirectInputDevice(directInput, DeviceClass.GameControl, dev.InstanceGuid);
+                        } else {
+                            diDevice2 = new AltDirectInputDevice(directInput, DeviceClass.GameControl, dev.InstanceGuid);
+                        }
+                        diActive[p - 1] = true;
+                        Logger.LogInfo("Selected DirectInput device (P"+p+"): " + dev.ProductName);
+                        altEnabled = true;
+                    }
                 }
             }
             if (altEnabled) {
                 try {
-                    Logger.LogDebug("Opening device");
-                    diDevice.OpenDevice();
+                    Logger.LogDebug("Opening device P1");
+                    diDevice1.OpenDevice();
                     if (OSDEnabled.Value) {
-                        Logger.LogMessage("Controller OK");
+                        Logger.LogMessage("Controller P1 OK");
                     }
                 } catch (Exception ex) {
                     Logger.LogMessage("AltInput: Failed to open device");
                     Logger.LogError(ex);
+                }
+                if (diActive[1]) {
+                    try {
+                        Logger.LogDebug("Opening device P2");
+                        diDevice2.OpenDevice();
+                        if (OSDEnabled.Value) {
+                            Logger.LogMessage("Controller P2 OK");
+                        }
+                    } catch (Exception ex) {
+                        Logger.LogMessage("AltInput: Failed to open device");
+                        Logger.LogError(ex);
+                    }
                 }
             }
         }
 
         void Update() {
             if (altEnabled) {
-                diDevice.ProcessInput();
+                if (diActive[0]) {
+                    diDevice1.ProcessInput();
+                }
+                if (diActive[1]) {
+                    diDevice2.ProcessInput();
+                }
             }
         }
 
@@ -87,8 +109,20 @@ namespace AltInput {
             return altEnabled;
         }
 
-        public static AltDirectInputDevice GetDevice() {
-            return diDevice;
+        public static bool IsDevice1Active() {
+            return diActive[0];
+        }
+
+        public static bool IsDevice2Active() {
+            return diActive[1];
+        }
+
+        public static AltDirectInputDevice GetDevice1() {
+            return diDevice1;
+        }
+
+        public static AltDirectInputDevice GetDevice2() {
+            return diDevice2;
         }
 
     }

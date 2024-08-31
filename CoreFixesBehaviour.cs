@@ -13,7 +13,7 @@ using System.IO;
 using FFCoreFixes.Patches;
 
 namespace FFCoreFixes {
-    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.6")]
+    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.6.1")]
     [BepInDependency("eu.harukakyoubate.altinput")]
     public class CoreFixesBehaviour : BaseUnityPlugin {
         private static readonly string[] AxisNames = { "Off", "HorizontalLeft1", "VerticalLeft1", "HorizontalRight1", "VerticalRight1", "HorizontalLeft2", "VerticalLeft2", "HorizontalRight2", "VerticalRight2", "HorizontalDpad1", "VerticalDpad1", "HorizontalDpad2", "VerticalDpad2" };
@@ -52,6 +52,7 @@ namespace FFCoreFixes {
         public static ConfigEntry<bool> ConfigShowCursor;
         public static ConfigEntry<bool> AltInputP2Setting;
         public static ConfigEntry<bool> ShopRestorationPatch;
+        public static ConfigEntry<bool> CardReaderHooks;
 
         private bool photonIsPatched;
 
@@ -93,6 +94,7 @@ namespace FFCoreFixes {
             InvertRY = Config.Bind("Game Input (Controller)", "Invert Right Y Axis", false, "Inverts the right stick's Y-Axis.");
             ControllerDeadzone = Config.Bind("Game Input (Controller)", "Stick Deadzone", 50, new ConfigDescription("The deadzone size for stick input", new AcceptableValueRange<int>(0, 100)));
 
+            CardReaderHooks = Config.Bind("Network", "Card Reader Hooks", true, "Enable card reader emulation. Disable to use a real card reader. Requires restart.");
             CardId = Config.Bind("Network", "NESiCA Card ID", RandomString(16), "The NESiCA card ID used for card swiping.\nMust be 16 characters.");
             DisableGameSrvHttps = Config.Bind("Network", "Disable secure game server communication", true, "If enabled, game server communication uses HTTP instead of HTTPS. Will only work with unpatched SimpleNesys.dll");
             ForceOfflineMatching = Config.Bind("Network", "Spoof matching server", true, "Disables the matching server. Must be turned off if using real photon server.");
@@ -119,7 +121,9 @@ namespace FFCoreFixes {
             MiscPatches.log = Logger;
             GamePatches.Log = Logger;
             NetPatches.Log = Logger;
-            h.PatchAll(typeof(IsmACIOPatches));
+            if (CardReaderHooks.Value) {
+                h.PatchAll(typeof(IsmACIOPatches));
+            }
             h.PatchAll(typeof(NesicaReaderPatches));
             h.PatchAll(typeof(TouchPanelPatches));
             h.PatchAll(typeof(MiscPatches));

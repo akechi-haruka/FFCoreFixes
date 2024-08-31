@@ -49,7 +49,6 @@ namespace FFCoreFixes
         public static ConfigEntry<bool> DumpMusicDB;
         public static ConfigEntry<bool> UseOnlyLeftStick;
         public static ConfigEntry<AltInputMode> AltInputSetting;
-        public static ConfigEntry<bool> UsePhotonCloud;
         public static ConfigEntry<String> PhotonApplicationId;
         public static ConfigEntry<bool> ConfigShowCursor;
         public static ConfigEntry<bool> AltInputP2Setting;
@@ -107,10 +106,7 @@ namespace FFCoreFixes
 
             AllCollecaAvailable = Config.Bind("Gameplay", "All colleca permanently available", true, "This allows all colleca cards to be permanently available, regardless of system time.\n(This prevents a crash when there are no more colleca available after the game's shutdown)");
 
-            PhotonApplicationId = Config.Bind("Network", "Photon Application ID", "", new ConfigDescription("Application GUID for Photon Cloud", null, new ConfigurationManagerAttributes() {
-                IsAdvanced = true
-            }));
-            UsePhotonCloud = Config.Bind("Network", "Use Photon Cloud", false, new ConfigDescription("Use real photon server cloud", null, new ConfigurationManagerAttributes() {
+            PhotonApplicationId = Config.Bind("Network", "Photon Application ID", "", new ConfigDescription("Application GUID for Photon", null, new ConfigurationManagerAttributes() {
                 IsAdvanced = true
             }));
 

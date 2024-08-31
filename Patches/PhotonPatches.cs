@@ -31,14 +31,6 @@ namespace FFCoreFixes.Patches {
             Log.LogInfo("Photon:ConnectUsingSettings");
             PhotonNetwork.logLevel = PhotonLogLevel.Full;
             PhotonNetwork.PhotonServerSettings.AppID = CoreFixesBehaviour.PhotonApplicationId.Value;
-            if (CoreFixesBehaviour.UsePhotonCloud.Value) {
-                Log.LogInfo("Photon:UseCloud");
-                PhotonNetwork.PhotonServerSettings.UseCloud(CoreFixesBehaviour.PhotonApplicationId.Value);
-                PhotonHandler.BestRegionCodeInPreferences = CloudRegionCode.eu;
-                PhotonNetwork.PhotonServerSettings.Protocol = ExitGames.Client.Photon.ConnectionProtocol.Tcp;
-                __result = PhotonNetwork.ConnectToBestCloudServer(gameVersion);
-                return false;
-            }
             return true;
         }
 

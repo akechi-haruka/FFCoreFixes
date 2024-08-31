@@ -38,14 +38,11 @@
     <Reference Include="0Harmony20">
       <HintPath>..\..\..\..\GAMES\SDVX\finalfantasy\BepInEx\core\0Harmony20.dll</HintPath>
     </Reference>
-    <Reference Include="AltInput">
-      <HintPath>..\..\ongeki\BepInExPluginOngekiFixes\AltInput\bin\Debug\AltInput.dll</HintPath>
-    </Reference>
     <Reference Include="Assembly-CSharp-firstpass">
       <HintPath>..\..\..\..\GAMES\SDVX\finalfantasy\game_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
     </Reference>
-    <Reference Include="Assembly-CSharp_publicized">
-      <HintPath>..\..\..\..\GAMES\SDVX\finalfantasy\game_Data\Managed\publicized_assemblies\Assembly-CSharp_publicized.dll</HintPath>
+    <Reference Include="Assembly-CSharp-nstrip">
+      <HintPath>L:\SDVX\ff18\game_Data\Managed\Assembly-CSharp-nstrip.dll</HintPath>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\GAMES\SDVX\finalfantasy\BepInEx\core\BepInEx.dll</HintPath>
@@ -95,11 +92,18 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="AltInput\AltInput.csproj">
+      <Project>{38950031-334d-4877-b896-23d344f68846}</Project>
+      <Name>AltInput</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy /Y $(TargetDir)$(TargetFileName) L:\SDVX\ff\BepInEx\plugins
 copy /Y $(TargetDir)$(TargetName).pdb L:\SDVX\ff\BepInEx\plugins
-</PostBuildEvent>
+copy /Y $(TargetDir)$(TargetFileName) L:\SDVX\ff18\BepInEx\plugins
+copy /Y $(TargetDir)$(TargetName).pdb L:\SDVX\ff18\BepInEx\plugins</PostBuildEvent>
   </PropertyGroup>
   <Import Project="packages\SharpDX.2.6.3\build\SharpDX.targets" Condition="Exists('packages\SharpDX.2.6.3\build\SharpDX.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

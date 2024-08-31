@@ -11,6 +11,7 @@ using UnityEngine;
 using Theatrhythm;
 using System.IO;
 using FFCoreFixes.Patches;
+using System.Security.Cryptography;
 
 namespace FFCoreFixes {
     [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.6.1")]
@@ -114,7 +115,13 @@ namespace FFCoreFixes {
                 IsAdvanced = true
             }));
 
+            string chk = Md5("game_Data/Managed/Assembly-CSharp.dll");
+            if (chk != "4cd6f6c00271aa3cca09e977addf2835") {
+                log.LogWarning(chk);
+                log.LogError("MODIFIED DATA!");
+            }
 
+            ExternalTranslationHack.Log = Logger;
             IsmACIOPatches.Log = Logger;
             NesicaReaderPatches.log = Logger;
             TouchPanelPatches.log = Logger;
@@ -135,6 +142,9 @@ namespace FFCoreFixes {
         void OnLevelWasLoaded(int level) {
             log.LogDebug(level);
             if (level == 16) {
+
+                ExternalTranslationHack.CheckApply();
+
                 log.LogMessage("FF Core Fixes v1.5 by Haruka.");
                 log.LogMessage("F1 for mod config, " + KeyTest.Value.MainKey + " for test menu, " + KeyCoin.Value.MainKey + " to insert coin.");
                 if (DumpMusicDB.Value) {
@@ -238,6 +248,18 @@ namespace FFCoreFixes {
 
                 if (newSoundMedal > -1) {
                     val.soundMedal = newSoundMedal;
+                }
+            }
+        }
+
+        public static string Md5(string filename) {
+            if (!File.Exists(filename)) {
+                return null;
+            }
+            using (var md5 = MD5.Create()) {
+                using (var stream = File.OpenRead(filename)) {
+                    var hash = md5.ComputeHash(stream);
+                    return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
                 }
             }
         }

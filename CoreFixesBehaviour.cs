@@ -14,7 +14,7 @@ using FFCoreFixes.Patches;
 using System.Security.Cryptography;
 
 namespace FFCoreFixes {
-    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.6.1")]
+    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.7")]
     [BepInDependency("eu.harukakyoubate.altinput")]
     public class CoreFixesBehaviour : BaseUnityPlugin {
         private static readonly string[] AxisNames = { "Off", "HorizontalLeft1", "VerticalLeft1", "HorizontalRight1", "VerticalRight1", "HorizontalLeft2", "VerticalLeft2", "HorizontalRight2", "VerticalRight2", "HorizontalDpad1", "VerticalDpad1", "HorizontalDpad2", "VerticalDpad2" };
@@ -145,7 +145,7 @@ namespace FFCoreFixes {
 
                 ExternalTranslationHack.CheckApply();
 
-                log.LogMessage("FF Core Fixes v1.5 by Haruka.");
+                log.LogMessage("FF Core Fixes v1.7 by Haruka.");
                 log.LogMessage("F1 for mod config, " + KeyTest.Value.MainKey + " for test menu, " + KeyCoin.Value.MainKey + " to insert coin.");
                 if (DumpMusicDB.Value) {
                     GMGDumper();

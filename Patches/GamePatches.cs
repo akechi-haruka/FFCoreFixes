@@ -246,5 +246,6 @@ namespace FFCoreFixes {
 				return true;
             }
         }
+
 	}
 }

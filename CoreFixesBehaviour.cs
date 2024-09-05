@@ -128,10 +128,10 @@ namespace FFCoreFixes {
             MiscPatches.log = Logger;
             GamePatches.Log = Logger;
             NetPatches.Log = Logger;
+            h.PatchAll(typeof(IsmACIOPatches));
             if (CardReaderHooks.Value) {
-                h.PatchAll(typeof(IsmACIOPatches));
+                h.PatchAll(typeof(NesicaReaderPatches));
             }
-            h.PatchAll(typeof(NesicaReaderPatches));
             h.PatchAll(typeof(TouchPanelPatches));
             h.PatchAll(typeof(MiscPatches));
             h.PatchAll(typeof(GamePatches));

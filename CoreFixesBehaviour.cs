@@ -14,7 +14,7 @@ using FFCoreFixes.Patches;
 using System.Security.Cryptography;
 
 namespace FFCoreFixes {
-    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.7")]
+    [BepInPlugin("eu.harukakyoubate.ff.corefixes", "FF Core Fixes", "1.7.1")]
     [BepInDependency("eu.harukakyoubate.altinput")]
     public class CoreFixesBehaviour : BaseUnityPlugin {
         private static readonly string[] AxisNames = { "Off", "HorizontalLeft1", "VerticalLeft1", "HorizontalRight1", "VerticalRight1", "HorizontalLeft2", "VerticalLeft2", "HorizontalRight2", "VerticalRight2", "HorizontalDpad1", "VerticalDpad1", "HorizontalDpad2", "VerticalDpad2" };
@@ -136,7 +136,6 @@ namespace FFCoreFixes {
             h.PatchAll(typeof(MiscPatches));
             h.PatchAll(typeof(GamePatches));
             h.PatchAll(typeof(NetPatches));
-            h.PatchAll(typeof(NetPatches));
         }
 
         void OnLevelWasLoaded(int level) {
@@ -145,7 +144,7 @@ namespace FFCoreFixes {
 
                 ExternalTranslationHack.CheckApply();
 
-                log.LogMessage("FF Core Fixes v1.7 by Haruka.");
+                log.LogMessage("FF Core Fixes v1.7.1 by Haruka.");
                 log.LogMessage("F1 for mod config, " + KeyTest.Value.MainKey + " for test menu, " + KeyCoin.Value.MainKey + " to insert coin.");
                 if (DumpMusicDB.Value) {
                     GMGDumper();
@@ -209,9 +208,6 @@ namespace FFCoreFixes {
             foreach (var val in CollectionCardTable.CharacterTable.Dictionary.Values) {
                 str += val.ID + "," + val.characterID + "," + val.rarity + "\n";
             }
-            foreach (var val in CollectionCardTable.JacketTable.Dictionary.Values) {
-                str += val.ID + "," + val.characterID + "," + val.rarity + "\n";
-            }
             File.WriteAllText("colleca.csv", str);
             str = "ID,Name\n";
             foreach (var val in AirshipTable.EntityAirshipTable.dictionary.Values) {
@@ -246,8 +242,9 @@ namespace FFCoreFixes {
                     }
                 }
 
-                if (newSoundMedal > -1) {
+                if (newSoundMedal > 0) {
                     val.soundMedal = newSoundMedal;
+                    val.secretMusic = true;
                 }
             }
         }
